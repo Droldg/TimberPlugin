@@ -1,0 +1,28 @@
+# Worlds where Timber is active (empty = all worlds)
+enabledWorlds: []
+
+# Require that the player uses an axe
+requireAxe: true
+
+# If true, each broken extra log attempts to consume durability (with Unbreaking effect)
+consumeDurabilityPerBlock: true
+
+# Hard safety cap for connected logs per action (prevents nuking entire forests by accident)
+maxBlocks: 512
+
+# If true, sneaking disables Timber for the action (unless player has timber.force)
+sneakToDisable: true
+
+# Replant behavior
+replantSapling: true
+replant2x2: true
+saplingReplantDelayTicks: 20
+
+# Allowed axes (if requireAxe = true)
+allowedAxes:
+  - WOODEN_AXE
+  - STONE_AXE
+  - IRON_AXE
+  - GOLDEN_AXE
+  - DIAMOND_AXE
+  - NETHERITE_AXE

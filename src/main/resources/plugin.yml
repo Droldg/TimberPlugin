@@ -1,0 +1,19 @@
+name: Timber
+main: org.example.timber.TimberPlugin
+version: 1.3.2
+api-version: '1.21'
+author: You
+
+permissions:
+  timber.use:
+    description: Allow player to use timber
+    default: true
+  timber.force:
+    description: Ignore sneakToDisable and per-player toggle
+    default: op
+
+commands:
+  timber:
+    description: Toggle Timber on/off for yourself
+    usage: /timber
+    permission: timber.use
