@@ -50,7 +50,7 @@ public class TimberListener implements Listener {
             if (!allowed.contains(tool.getType().name())) return;
         }
 
-        int max = Math.max(1, cfg.getInt("maxBlocks", 512));
+        int max = Math.max(1, cfg.getInt("maxBlocks", 256));
         boolean diag = switch (TreeUtils.familyOf(originalLogType)) {
             case OAK, JUNGLE, CHERRY -> true;
             default -> {

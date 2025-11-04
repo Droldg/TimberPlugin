@@ -8,7 +8,7 @@ requireAxe: true
 consumeDurabilityPerBlock: true
 
 # Hard safety cap for connected logs per action (prevents nuking entire forests by accident)
-maxBlocks: 512
+maxBlocks: 256
 
 # If true, sneaking disables Timber for the action (unless player has timber.force)
 sneakToDisable: true
