@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="timber-plugin:jar">
+    <output-path>$PROJECT_DIR$/../../../plugins</output-path>
+    <root id="archive" name="timber-plugin.jar">
+      <element id="module-output" name="timber-plugin" />
+    </root>
+  </artifact>
+</component>

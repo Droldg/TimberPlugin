@@ -111,7 +111,7 @@ public class SaplingHelper {
 
     private static boolean isPlantable(Material m) {
         switch (m) {
-            case DIRT, GRASS_BLOCK, PODZOL, COARSE_DIRT, ROOTED_DIRT, MYCELIUM, MOSS_BLOCK:
+            case DIRT, GRASS_BLOCK, PODZOL, COARSE_DIRT, ROOTED_DIRT, MYCELIUM, MOSS_BLOCK, PALE_MOSS_BLOCK:
                 return true;
             default:
                 return false;
