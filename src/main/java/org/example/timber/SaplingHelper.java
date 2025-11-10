@@ -19,12 +19,11 @@ public class SaplingHelper {
             case DARK_OAK_LOG, STRIPPED_DARK_OAK_LOG:   return Material.DARK_OAK_SAPLING;
             case MANGROVE_LOG, STRIPPED_MANGROVE_LOG:   return Material.MANGROVE_PROPAGULE;
             case CHERRY_LOG, STRIPPED_CHERRY_LOG:       return Material.CHERRY_SAPLING;
-            
             default: {
                 String n = log.name();
                 if (n.contains("PALE_OAK")) {
                     Material sap = Material.matchMaterial("PALE_OAK_SAPLING");
-                    return sap;
+                    if (sap != null) return sap;
                 }
                 return null;
             }
@@ -35,14 +34,24 @@ public class SaplingHelper {
         switch (log) {
             case SPRUCE_LOG, STRIPPED_SPRUCE_LOG,
                  JUNGLE_LOG, STRIPPED_JUNGLE_LOG,
-                 DARK_OAK_LOG, STRIPPED_DARK_OAK_LOG,
-                 PALE_OAK_LOG, STRIPPED_PALE_OAK_LOG:
-
-
+                 DARK_OAK_LOG, STRIPPED_DARK_OAK_LOG:
                 return true;
             default:
                 return false;
         }
+    }
+
+    /**
+     * True if ANY log in the cluster sits directly on plantable ground (i.e., logs that actually touch the ground).
+     * Used to avoid replanting when the player only breaks a floating branch.
+     */
+    public static boolean clusterTouchesGround(Set<Block> cluster) {
+        if (cluster == null || cluster.isEmpty()) return false;
+        for (Block b : cluster) {
+            Block below = b.getRelative(0, -1, 0);
+            if (isPlantable(below.getType())) return true;
+        }
+        return false;
     }
 
     public static List<Location> planReplantSpotsFromCluster(Location origin, Set<Block> cluster, Material logType, boolean allow2x2) {
@@ -111,7 +120,7 @@ public class SaplingHelper {
 
     private static boolean isPlantable(Material m) {
         switch (m) {
-            case DIRT, GRASS_BLOCK, PODZOL, COARSE_DIRT, ROOTED_DIRT, MYCELIUM, MOSS_BLOCK, PALE_MOSS_BLOCK:
+            case DIRT, GRASS_BLOCK, PODZOL, COARSE_DIRT, ROOTED_DIRT, MYCELIUM, MOSS_BLOCK:
                 return true;
             default:
                 return false;

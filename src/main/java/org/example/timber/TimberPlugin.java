@@ -18,6 +18,7 @@ public class TimberPlugin extends JavaPlugin {
         saveDefaultConfig();
         FileConfiguration cfg = getConfig();
         cfg.addDefault("maxBlocks", 512);
+        cfg.addDefault("Animations", true);
         cfg.options().copyDefaults(true);
         saveConfig();
 

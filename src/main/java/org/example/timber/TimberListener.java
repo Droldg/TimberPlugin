@@ -41,7 +41,8 @@ public class TimberListener implements Listener {
 
         List<String> worlds = cfg.getStringList("enabledWorlds");
         if (!worlds.isEmpty() && !worlds.contains(origin.getWorld().getName())) return;
-        if (cfg.getBoolean("sneakToDisable", true) && player.isSneaking() && !player.hasPermission("timber.force")) return;
+        if (cfg.getBoolean("sneakToDisable", true) && player.isSneaking()) return;
+
 
         ItemStack tool = player.getInventory().getItem(EquipmentSlot.HAND);
         if (cfg.getBoolean("requireAxe", true)) {
@@ -50,7 +51,7 @@ public class TimberListener implements Listener {
             if (!allowed.contains(tool.getType().name())) return;
         }
 
-        int max = Math.max(1, cfg.getInt("maxBlocks", 256));
+        int max = Math.max(1, cfg.getInt("maxBlocks", 512));
         boolean diag = switch (TreeUtils.familyOf(originalLogType)) {
             case OAK, JUNGLE, CHERRY -> true;
             default -> {
@@ -60,8 +61,13 @@ public class TimberListener implements Listener {
         };
         Set<Block> cluster = TreeUtils.collectConnectedLogs(origin, max, diag);
 
+        // NEW: only plan/plant if logs actually touch ground
+        boolean grounded = SaplingHelper.clusterTouchesGround(cluster);
+
         boolean do2x2 = cfg.getBoolean("replant2x2", true);
-        List<Location> plannedSpots = SaplingHelper.planReplantSpotsFromCluster(origin.getLocation(), cluster, originalLogType, do2x2);
+        List<Location> plannedSpots = grounded
+                ? SaplingHelper.planReplantSpotsFromCluster(origin.getLocation(), cluster, originalLogType, do2x2)
+                : Collections.emptyList();
 
         event.setCancelled(true);
 
@@ -74,14 +80,18 @@ public class TimberListener implements Listener {
             if (consumeDurability && !damageTool(tool)) tool.setAmount(0);
         }
 
-        if (broken > 0 && cfg.getBoolean("replantSapling", true)) {
+
+        if (grounded && broken > 0 && cfg.getBoolean("replantSapling", true)) {
             Material sapling = SaplingHelper.saplingFor(originalLogType);
             if (sapling != null && !plannedSpots.isEmpty()) {
                 int delay = cfg.getInt("saplingReplantDelayTicks", 20);
                 new BukkitRunnable() {
                     @Override public void run() {
                         for (Location base : plannedSpots) {
-                            SaplingHelper.plantSapling(base, sapling);
+                            boolean planted = SaplingHelper.plantSapling(base, sapling);
+                            if (planted && cfg.getBoolean("Animations", true)) {
+                                Animation.playReplantAnimation(Collections.singletonList(base), plugin);
+                            }
                         }
                     }
                 }.runTaskLater(plugin, delay);

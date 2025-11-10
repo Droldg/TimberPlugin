@@ -1,6 +1,6 @@
 name: Timber
 main: org.example.timber.TimberPlugin
-version: 1.3.3
+version: 1.3.4
 api-version: '1.21'
 author: You
 
