@@ -37,15 +37,18 @@ public class TreeUtils {
             case CHERRY_LOG, STRIPPED_CHERRY_LOG:       return WoodFamily.CHERRY;
             default: {
                 String n = m.name();
-                if (n.contains("PALE_OAK")) return WoodFamily.DARK_OAK; // treat as DARK OAK family
+                if (n.contains("PALE_OAK")) return WoodFamily.OAK; // treat as OAK family
                 return null;
             }
         }
     }
 
-    public static Set<Block> collectConnectedLogs(Block start, int max, boolean includeDiagonals) {
+    public static Set<Block> collectConnectedLogs(Block start, int max, boolean includeDiagonals, int maxHoriz) {
         Set<Block> out = new LinkedHashSet<>();
         if (!Tag.LOGS.isTagged(start.getType())) return out;
+
+        final int sx = start.getX();
+        final int sz = start.getZ();
 
         WoodFamily family = familyOf(start.getType());
         if (family == null) return out;
@@ -60,19 +63,53 @@ public class TreeUtils {
             Block b = dq.pollFirst();
             for (int[] d : OFFSETS) {
                 Block n = b.getRelative(d[0], d[1], d[2]);
-                if (out.contains(n)) continue;
-                Material t = n.getType();
-                if (!Tag.LOGS.isTagged(t)) continue;
-                if (familyOf(t) != family) continue;
-                out.add(n);
-                if (out.size() >= max) break;
-                dq.add(n);
+                if (maxHoriz > 0 && (Math.abs(n.getX()-sx) > maxHoriz || Math.abs(n.getZ()-sz) > maxHoriz)) continue;
+                if (!out.contains(n) && isSameFamilyLog(n, family)) {
+                    out.add(n);
+                    if (out.size() >= max) break;
+                    dq.add(n);
+                    continue;
+                }
+
+                // Leaf-bridge (only when diagonals are allowed and leaves match same family): log -> leaves -> log
+                if (includeDiagonals && Tag.LEAVES.isTagged(n.getType()) && leafMatchesFamily(n.getType(), family)) {
+                    Block n2 = b.getRelative(d[0]*2, d[1]*2, d[2]*2);
+                    if (maxHoriz > 0 && (Math.abs(n2.getX()-sx) > maxHoriz || Math.abs(n2.getZ()-sz) > maxHoriz)) continue;
+                    if (!out.contains(n2) && isSameFamilyLog(n2, family)) {
+                        out.add(n2);
+                        if (out.size() >= max) break;
+                        dq.add(n2);
+                    }
+                }
             }
         }
         return out;
     }
 
+    public static Set<Block> collectConnectedLogs(Block start, int max, boolean includeDiagonals) {
+        return collectConnectedLogs(start, max, includeDiagonals, 0);
+    }
+
     public static Set<Block> collectConnectedLogs(Block start, int max) {
-        return collectConnectedLogs(start, max, false);
+        return collectConnectedLogs(start, max, false, 0);
+    }
+
+    private static boolean isSameFamilyLog(Block b, WoodFamily family) {
+        Material t = b.getType();
+        return Tag.LOGS.isTagged(t) && familyOf(t) == family;
+    }
+
+    private static boolean leafMatchesFamily(Material leaves, WoodFamily family) {
+        return switch (family) {
+            case OAK -> leaves == Material.OAK_LEAVES || leaves.name().contains("PALE_OAK_LEAVES");
+            case DARK_OAK -> leaves == Material.DARK_OAK_LEAVES;
+            case BIRCH -> leaves == Material.BIRCH_LEAVES;
+            case SPRUCE -> leaves == Material.SPRUCE_LEAVES;
+            case JUNGLE -> leaves == Material.JUNGLE_LEAVES;
+            case ACACIA -> leaves == Material.ACACIA_LEAVES;
+            case MANGROVE -> leaves == Material.MANGROVE_LEAVES;
+            case CHERRY -> leaves == Material.CHERRY_LEAVES;
+
+        };
     }
 }

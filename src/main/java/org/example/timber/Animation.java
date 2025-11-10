@@ -12,21 +12,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
-/**
- * Tiny helper for simple visual/audio effects. Optional to use.
- */
+
 public final class Animation {
 
     private Animation() {}
 
-    /**
-     * Plays a short particle/sound sequence along the broken logs (bottom → top).
-     */
-
-
-    /**
-     * Small sparkle when saplings get placed.
-     */
     public static void playReplantAnimation(Collection<Location> spots, JavaPlugin plugin) {
         if (spots == null || spots.isEmpty()) return;
         for (Location base : spots) {

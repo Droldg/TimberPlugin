@@ -20,7 +20,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class TimberListener implements Listener {
 
@@ -43,7 +42,6 @@ public class TimberListener implements Listener {
         if (!worlds.isEmpty() && !worlds.contains(origin.getWorld().getName())) return;
         if (cfg.getBoolean("sneakToDisable", true) && player.isSneaking()) return;
 
-
         ItemStack tool = player.getInventory().getItem(EquipmentSlot.HAND);
         if (cfg.getBoolean("requireAxe", true)) {
             if (tool == null) return;
@@ -53,15 +51,21 @@ public class TimberListener implements Listener {
 
         int max = Math.max(1, cfg.getInt("maxBlocks", 512));
         boolean diag = switch (TreeUtils.familyOf(originalLogType)) {
-            case OAK, JUNGLE, CHERRY -> true;
-            default -> {
-                if (originalLogType.name().contains("PALE_OAK")) yield true; // treat Pale Oak like OAK
-                yield false;
-            }
+            case OAK, JUNGLE, CHERRY, DARK_OAK -> true;
+            default -> false;
         };
-        Set<Block> cluster = TreeUtils.collectConnectedLogs(origin, max, diag);
+        if (!diag && originalLogType.name().contains("PALE_OAK")) diag = true;
 
-        // NEW: only plan/plant if logs actually touch ground
+        // tighter horizontal clamp to avoid neighbouring trees
+        int horiz = switch (TreeUtils.familyOf(originalLogType)) {
+            case OAK, DARK_OAK, CHERRY -> 3;
+            case JUNGLE -> 4;
+            default -> 2;
+        };
+        if (originalLogType.name().contains("PALE_OAK")) horiz = 3;
+
+        Set<Block> cluster = TreeUtils.collectConnectedLogs(origin, max, diag, horiz);
+
         boolean grounded = SaplingHelper.clusterTouchesGround(cluster);
 
         boolean do2x2 = cfg.getBoolean("replant2x2", true);
@@ -107,8 +111,8 @@ public class TimberListener implements Listener {
         if (tool == null) return false;
         ItemMeta meta = tool.getItemMeta();
         if (!(meta instanceof Damageable dmg)) return true;
-        int lvl = tool.getEnchantmentLevel(Enchantment.UNBREAKING);
-        boolean shouldDamage = lvl <= 0 || (ThreadLocalRandom.current().nextInt(lvl + 1) == 0);
+        int lvl = tool.getEnchantmentLevel(org.bukkit.enchantments.Enchantment.UNBREAKING);
+        boolean shouldDamage = lvl <= 0 || (java.util.concurrent.ThreadLocalRandom.current().nextInt(lvl + 1) == 0);
         if (shouldDamage) {
             int newDamage = dmg.getDamage() + 1;
             int max = tool.getType().getMaxDurability();
