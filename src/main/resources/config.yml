@@ -10,9 +10,6 @@ consumeDurabilityPerBlock: true
 # Hard safety cap for connected logs per action (prevents nuking entire forests by accident)
 maxBlocks: 512
 
-# If true, sneaking disables Timber for the action (unless player has timber.force)
-sneakToDisable: true
-
 # Visual/audio effects (particles + sounds)
 Animations: true
 

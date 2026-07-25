@@ -8,7 +8,6 @@ import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -40,7 +39,7 @@ public class TimberListener implements Listener {
 
         List<String> worlds = cfg.getStringList("enabledWorlds");
         if (!worlds.isEmpty() && !worlds.contains(origin.getWorld().getName())) return;
-        if (cfg.getBoolean("sneakToDisable", true) && player.isSneaking()) return;
+        if (player.isSneaking()) return;
 
         ItemStack tool = player.getInventory().getItem(EquipmentSlot.HAND);
         if (cfg.getBoolean("requireAxe", true)) {
