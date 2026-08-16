@@ -37,7 +37,7 @@ public class SaplingHelper {
                  DARK_OAK_LOG, STRIPPED_DARK_OAK_LOG:
                 return true;
             default:
-                return false;
+                return log.name().contains("PALE_OAK");
         }
     }
 

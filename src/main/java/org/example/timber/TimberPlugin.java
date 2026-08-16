@@ -12,6 +12,7 @@ import java.util.UUID;
 public class TimberPlugin extends JavaPlugin {
 
     private final Set<UUID> toggledOff = new HashSet<>();
+    private final Set<UUID> saplingsToggledOff = new HashSet<>();
 
     @Override
     public void onEnable() {
@@ -44,10 +45,34 @@ public class TimberPlugin extends JavaPlugin {
             });
         }
 
+        PluginCommand saplingsCommand = getCommand("saplings");
+        if (saplingsCommand == null) {
+            getLogger().severe("Command 'saplings' missing from plugin.yml! Did the jar include plugin.yml?");
+        } else {
+            saplingsCommand.setExecutor((sender, command, label, args) -> {
+                if (!(sender instanceof org.bukkit.entity.Player player)) {
+                    sender.sendMessage("This command is player-only.");
+                    return true;
+                }
+                UUID id = player.getUniqueId();
+                if (saplingsToggledOff.remove(id)) {
+                    player.sendMessage("§aSaplings: §fON");
+                } else {
+                    saplingsToggledOff.add(id);
+                    player.sendMessage("§cSaplings: §fOFF");
+                }
+                return true;
+            });
+        }
+
         getLogger().info("Timber enabled v" + getDescription().getVersion());
     }
 
     public boolean isToggledOff(UUID id) {
         return toggledOff.contains(id);
+    }
+
+    public boolean areSaplingsToggledOff(UUID id) {
+        return saplingsToggledOff.contains(id);
     }
 }

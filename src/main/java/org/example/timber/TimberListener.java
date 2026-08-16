@@ -84,7 +84,8 @@ public class TimberListener implements Listener {
         }
 
 
-        if (grounded && broken > 0 && cfg.getBoolean("replantSapling", true)) {
+        if (grounded && broken > 0 && cfg.getBoolean("replantSapling", true)
+                && !plugin.areSaplingsToggledOff(player.getUniqueId())) {
             Material sapling = SaplingHelper.saplingFor(originalLogType);
             if (sapling != null && !plannedSpots.isEmpty()) {
                 int delay = cfg.getInt("saplingReplantDelayTicks", 20);

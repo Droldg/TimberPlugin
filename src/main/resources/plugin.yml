@@ -1,7 +1,7 @@
 name: Timber
 main: org.example.timber.TimberPlugin
 version: '${project.version}'
-api-version: '1.21'
+api-version: '26.2'
 author: You
 
 permissions:
@@ -13,4 +13,8 @@ commands:
   timber:
     description: Toggle Timber on/off for yourself
     usage: /timber
+    permission: timber.use
+  saplings:
+    description: Toggle automatic sapling replanting on/off for yourself
+    usage: /saplings
     permission: timber.use
